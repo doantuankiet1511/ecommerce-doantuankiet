@@ -7,7 +7,7 @@ module "cloudfront" {
     s3 = {
       domain_name = var.s3_bucket_domain_name
       origin_path = "" # Có thể để trống hoặc thêm nếu cần
-      origin_access_identity = var.OAI # Tên logic cho OAI
+      origin_access_control_id = aws_cloudfront_origin_access_control.this.id
     }
   }
 
@@ -45,4 +45,14 @@ module "cloudfront" {
     Name        = "ReactJS CloudFront"
     Environment = "default"
   }
+
+}
+
+# Tạo Origin Access Control
+resource "aws_cloudfront_origin_access_control" "this" {
+  name                              = "OAC-${var.s3_bucket_domain_name}"
+  description                       = "OAC for S3 bucket ${var.s3_bucket_domain_name}"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"  # Luôn ký request
+  signing_protocol                  = "sigv4"   # Dùng Signature Version 4
 }

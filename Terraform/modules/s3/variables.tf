@@ -19,3 +19,7 @@ variable "ignore_public_acls" {
 variable "restrict_public_buckets" {
   type = bool
 }
+variable "cloudfront_arn" {
+  type = string
+  description = "ARN của Cloudfront"
+}
