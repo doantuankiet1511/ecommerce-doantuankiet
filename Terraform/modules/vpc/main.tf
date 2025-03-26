@@ -16,9 +16,9 @@ module "vpc" {
   azs             = var.availability_zones
   private_subnets = var.private_subnet_ips
   public_subnets  = var.public_subnet_ips
-  enable_nat_gateway = true
-  enable_vpn_gateway = false
-  create_igw = true
+  enable_nat_gateway = var.enable_nat_gateway
+  enable_vpn_gateway = var.enable_vpn_gateway
+  create_igw = var.create_igw
 
 
   public_subnet_tags = {

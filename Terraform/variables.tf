@@ -25,6 +25,7 @@ variable "private_subnet_ips" {
 }
 variable "enable_nat_gateway" {
   type = bool
+  default = false
 }
 variable "enable_vpn_gateway" {
   type = bool
@@ -55,6 +56,7 @@ variable "ignore_public_acls" {
 variable "restrict_public_buckets" {
   type = bool
 }
+
 
 #cloudfont
 variable "OAI" {

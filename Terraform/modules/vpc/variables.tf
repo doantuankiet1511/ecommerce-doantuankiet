@@ -17,6 +17,7 @@ variable "private_subnet_ips" {
 }
 variable "enable_nat_gateway" {
   type = bool
+  default = false
 }
 variable "enable_vpn_gateway" {
   type = bool

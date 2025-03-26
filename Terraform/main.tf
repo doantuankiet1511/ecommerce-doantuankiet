@@ -37,6 +37,7 @@ module "s3" {
   block_public_policy = var.block_public_policy
   ignore_public_acls = var.ignore_public_acls
   restrict_public_buckets = var.restrict_public_buckets
+  cloudfront_arn = module.cloudfront.cloudfront_distribution_arn
 }
 
 module "cloudfront" {
@@ -60,6 +61,7 @@ module "cloudfront" {
   enabled = var.enabled
   restriction_type = var.restriction_type
   cloudfront_default_certificate = var.cloudfront_default_certificate
+  
 }
 
 module "vpc" {
@@ -73,4 +75,5 @@ module "vpc" {
   enable_vpn_gateway = var.enable_vpn_gateway
   create_igw = var.create_igw
 }
+
 
