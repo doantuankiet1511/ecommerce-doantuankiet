@@ -7,7 +7,7 @@ variable "key_name" {
 
 #vpc
 variable "vpc_name" {
-  type = string  
+  type = string
 }
 variable "cidr_block" {
   type = string
@@ -16,15 +16,15 @@ variable "availability_zones" {
   type = list(any)
 }
 variable "public_subnet_ips" {
-  type = list(string)
+  type        = list(string)
   description = "List of public subnet IPs CIDR"
 }
 variable "private_subnet_ips" {
-  type = list(string)
+  type        = list(string)
   description = "List of private subnet IPs CIDR"
 }
 variable "enable_nat_gateway" {
-  type = bool
+  type    = bool
   default = false
 }
 variable "enable_vpn_gateway" {
@@ -129,4 +129,22 @@ variable "jenkins_volume_size" {
 }
 variable "jenkins_volume_type" {
   type = string
+}
+
+#route53
+variable "domain_name" {
+  type = string
+}
+variable "comment" {
+  type = string
+}
+variable "environment" {
+  type = string
+}
+variable "type" {
+  type = string
+}
+variable "evaluate_target_health" {
+  type    = bool
+  default = false
 }

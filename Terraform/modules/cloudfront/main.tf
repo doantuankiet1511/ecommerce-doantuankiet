@@ -2,6 +2,8 @@ module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
   version = "~> 3.2"
 
+  aliases = ["fukishop.click"]
+  
   # Origin từ S3
   origin = {
     s3 = {
@@ -37,9 +39,13 @@ module "cloudfront" {
     restriction_type = var.restriction_type
   }
 
-  viewer_certificate = {
-    cloudfront_default_certificate = var.cloudfront_default_certificate
+ viewer_certificate = {
+    acm_certificate_arn      = var.acm_certificate_arn # Dùng chứng chỉ ACM
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
+
+
 
   tags = {
     Name        = "ReactJS CloudFront"

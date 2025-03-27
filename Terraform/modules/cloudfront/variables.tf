@@ -56,3 +56,6 @@ variable "restriction_type" {
 variable "cloudfront_default_certificate" {
   type = bool
 }
+variable "acm_certificate_arn" {
+  type = string
+}
