@@ -18,51 +18,60 @@ module "alb" {
 
 module "ec2" {
   source = "./modules/ec2"
+  jenkins_server_ami = var.jenkins_server_ami
+  jenkins_server_instance_type = var.jenkins_server_instance_type
+  jenkins_server_name = var.jenkins_server_name
+  key_name = var.key_name
+  vpc_id = module.vpc.vpc_id
+  jenkins_volume_size = var.jenkins_volume_size
+  jenkins_volume_type = var.jenkins_volume_type
+  public_subnet_ids = [module.vpc.public_subnet_ids_1]
 }
 
 module "rds" {
   source = "./modules/rds"
+  
 }
 
 module "route53" {
   source = "./modules/route53"
 }
 
-module "s3" {
-  source = "./modules/s3"
-  bucket_name = var.bucket_name
-  index_document = var.index_document
-  error_document = var.error_document
-  block_public_acls = var.block_public_acls
-  block_public_policy = var.block_public_policy
-  ignore_public_acls = var.ignore_public_acls
-  restrict_public_buckets = var.restrict_public_buckets
-  cloudfront_arn = module.cloudfront.cloudfront_distribution_arn
-}
+# module "s3" {
+#   source = "./modules/s3"
+#   bucket_name = var.bucket_name
+#   index_document = var.index_document
+#   error_document = var.error_document
+#   block_public_acls = var.block_public_acls
+#   block_public_policy = var.block_public_policy
+#   ignore_public_acls = var.ignore_public_acls
+#   restrict_public_buckets = var.restrict_public_buckets
+#   cloudfront_arn = module.cloudfront.cloudfront_distribution_arn
+# }
 
-module "cloudfront" {
-  source = "./modules/cloudfront"
-  s3_bucket_domain_name = module.s3.s3_bucket_domain_name
-  OAI = var.OAI
-  target_origin_id = var.target_origin_id
-  viewer_protocol_policy = var.viewer_protocol_policy
-  allowed_methods = var.allowed_methods
-  cached_methods = var.cached_methods
-  compress = var.compress
-  min_ttl = var.min_ttl
-  default_ttl = var.default_ttl
-  max_ttl = var.max_ttl
-  error_code = var.error_code
-  response_code = var.response_code
-  response_page_path = var.response_page_path
-  is_ipv6_enabled = var.is_ipv6_enabled
-  price_class = var.price_class
-  default_root_object = var.default_root_object
-  enabled = var.enabled
-  restriction_type = var.restriction_type
-  cloudfront_default_certificate = var.cloudfront_default_certificate
+# module "cloudfront" {
+#   source = "./modules/cloudfront"
+#   s3_bucket_domain_name = module.s3.s3_bucket_domain_name
+#   OAI = var.OAI
+#   target_origin_id = var.target_origin_id
+#   viewer_protocol_policy = var.viewer_protocol_policy
+#   allowed_methods = var.allowed_methods
+#   cached_methods = var.cached_methods
+#   compress = var.compress
+#   min_ttl = var.min_ttl
+#   default_ttl = var.default_ttl
+#   max_ttl = var.max_ttl
+#   error_code = var.error_code
+#   response_code = var.response_code
+#   response_page_path = var.response_page_path
+#   is_ipv6_enabled = var.is_ipv6_enabled
+#   price_class = var.price_class
+#   default_root_object = var.default_root_object
+#   enabled = var.enabled
+#   restriction_type = var.restriction_type
+#   cloudfront_default_certificate = var.cloudfront_default_certificate
   
-}
+# }
 
 module "vpc" {
   source = "./modules/vpc"

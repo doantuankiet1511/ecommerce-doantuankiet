@@ -113,3 +113,20 @@ variable "restriction_type" {
 variable "cloudfront_default_certificate" {
   type = bool
 }
+
+#ec2
+variable "jenkins_server_name" {
+  type = string
+}
+variable "jenkins_server_ami" {
+  type = string
+}
+variable "jenkins_server_instance_type" {
+  type = string
+}
+variable "jenkins_volume_size" {
+  type = string
+}
+variable "jenkins_volume_type" {
+  type = string
+}
