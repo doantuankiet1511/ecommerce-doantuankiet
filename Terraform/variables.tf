@@ -113,6 +113,9 @@ variable "restriction_type" {
 variable "cloudfront_default_certificate" {
   type = bool
 }
+variable "acm_certificate_arn_cloudfont" {
+  type = string
+}
 
 #ec2
 variable "jenkins_server_name" {
@@ -147,4 +150,15 @@ variable "type" {
 variable "evaluate_target_health" {
   type    = bool
   default = false
+}
+
+#alb
+variable "alb_name" {
+  type = string
+}
+variable "acm_certificate_arn_alb" {
+  type = string
+}
+variable "alb_security_group_name" {
+  type = string
 }

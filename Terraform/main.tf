@@ -21,6 +21,11 @@ provider "aws" {
 
 module "alb" {
   source = "./modules/alb"
+  alb_name = var.alb_name
+  public_subnet_ids = [module.vpc.public_subnet_ids_2]
+  acm_certificate_arn_alb = var.acm_certificate_arn_alb
+  vpc_id = module.vpc.vpc_id
+  alb_security_group_name = var.alb_security_group_name
 }
 
 # module "ec2" {
@@ -49,9 +54,9 @@ module "route53" {
   cloudfront_distribution_domain_name    = module.cloudfront.cloudfont_domain_name
   cloudfront_distribution_hosted_zone_id = module.cloudfront.cloudfront_distribution_hosted_zone_id
   evaluate_target_health                 = var.evaluate_target_health
-  providers = {
-    aws.use1 = aws.use1
-  }
+  # providers = {
+  #   aws.use1 = aws.use1
+  # }
 }
 
 
@@ -88,19 +93,19 @@ module "cloudfront" {
   enabled                        = var.enabled
   restriction_type               = var.restriction_type
   cloudfront_default_certificate = var.cloudfront_default_certificate
-  acm_certificate_arn            = module.route53.acm_arn
+  acm_certificate_arn_cloudfont = var.acm_certificate_arn_cloudfont
 }
 
-# module "vpc" {
-#   source = "./modules/vpc"
-#   availability_zones  = var.availability_zones
-#   cidr_block          = var.cidr_block
-#   public_subnet_ips   = var.public_subnet_ips
-#   private_subnet_ips  = var.private_subnet_ips
-#   vpc_name            = var.vpc_name
-#   enable_nat_gateway = var.enable_nat_gateway
-#   enable_vpn_gateway = var.enable_vpn_gateway
-#   create_igw = var.create_igw
-# }
+module "vpc" {
+  source = "./modules/vpc"
+  availability_zones  = var.availability_zones
+  cidr_block          = var.cidr_block
+  public_subnet_ips   = var.public_subnet_ips
+  private_subnet_ips  = var.private_subnet_ips
+  vpc_name            = var.vpc_name
+  enable_nat_gateway = var.enable_nat_gateway
+  enable_vpn_gateway = var.enable_vpn_gateway
+  create_igw = var.create_igw
+}
 
 

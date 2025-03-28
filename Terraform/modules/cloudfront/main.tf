@@ -40,7 +40,7 @@ module "cloudfront" {
   }
 
  viewer_certificate = {
-    acm_certificate_arn      = var.acm_certificate_arn # Dùng chứng chỉ ACM
+    acm_certificate_arn      = var.acm_certificate_arn_cloudfont # Dùng chứng chỉ ACM
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }

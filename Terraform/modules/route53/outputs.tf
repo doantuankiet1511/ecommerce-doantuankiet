@@ -1,3 +1,3 @@
-output "acm_arn" {
-  value = module.acm.acm_certificate_arn
-}
+# output "acm_arn" {
+#   value = module.acm.acm_certificate_arn
+# }
