@@ -20,7 +20,7 @@ B4: save
 Trong route53 tôi có tạo acm để create certificate dùng https, theo thiết kế hệ thống
 chúng ta sẽ gắn certificate này vào cloudfront, nhưng do cloudfront là service global, nên ta phải tạo certificate
 ở region us-east-1.
-Nhưng vì 1 lý do nào đó mà nó tạo quá lâu -> tự tạo bằng tay certificate nhé.
+
 
 #lệnh cơ bản ec2
 #Update OS

@@ -61,3 +61,35 @@ module "jenkins_sg" {
     Name = "Jenkins-SG"
   }
 }
+
+module "backend_security_group" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "~> 5.0"
+
+  name        = var.backend_security_group_name
+  description = "Security group for EC2 instances running Django"
+  vpc_id      = var.vpc_id
+
+  ingress_rules = [
+    {
+      from_port                = 8000
+      to_port                  = 8000
+      protocol                 = "tcp"
+      source_security_group_id = var.backend_security_group  # Cho phép từ ALB SG
+    }
+  ]
+
+  egress_rules = [
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]  # Cho phép outbound để kết nối RDS
+    }
+  ]
+
+  tags = {
+    Name        = "fukiapp-backend-sg"
+    Environment = "production"
+  }
+}

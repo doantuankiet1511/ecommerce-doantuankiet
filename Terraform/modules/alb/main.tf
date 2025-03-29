@@ -93,3 +93,57 @@ module "alb_security_group" {
     Environment = "production"
   }
 }
+
+module "backend_asg" {
+  source  = "terraform-aws-modules/autoscaling/aws"
+  version = "~> 6.0"
+
+  name = "fukiapp-backend-asg"
+
+  vpc_zone_identifier = var.private_subnet_ids[2]
+  target_group_arns   = module.alb.target_group_arns  # Kết nối ASG với Target Group của ALB
+  health_check_type   = "ELB"
+  min_size            = 2
+  max_size            = 4
+  desired_capacity    = 2
+
+  launch_template = {
+    name_prefix   = "fukiapp-backend-lt"
+    image_id      = var.ami_id
+    instance_type = "t2.medium"
+    user_data     = base64encode(<<-EOF
+              #!/bin/bash
+              yum update -y
+              yum install python3 python3-pip git -y
+              git clone https://github.com/doantuankiet1511/BackEnd.git /home/ec2-user/fukiapp
+              cd /home/ec2-user/fukiapp
+              python3 -m venv venv
+              source venv/bin/activate
+              pip install -r requirements.txt
+              pip install pymysql
+              python3 manage.py migrate
+              nohup python3 manage.py runserver 0.0.0.0:8000 &
+              EOF
+    )
+  }
+
+  network_interfaces = [
+    {
+      associate_public_ip_address = false
+      security_groups             = [var.backend_security_group_id]
+    }
+  ]
+
+  tags = [
+    {
+      key                 = "Name"
+      value               = "fukiapp-backend"
+      propagate_at_launch = true
+    },
+    {
+      key                 = "Environment"
+      value               = "production"
+      propagate_at_launch = true
+    }
+  ]
+}

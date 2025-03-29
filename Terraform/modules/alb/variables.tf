@@ -13,3 +13,9 @@ variable "acm_certificate_arn_alb" {
 variable "public_subnet_ids" {
   type = list(string)
 }
+variable "ami_id" {
+  type = string
+}
+variable "backend_security_group_id" {
+  type = string
+}
