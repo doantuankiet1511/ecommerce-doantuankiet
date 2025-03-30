@@ -75,7 +75,7 @@ module "backend_security_group" {
       from_port                = 8000
       to_port                  = 8000
       protocol                 = "tcp"
-      source_security_group_id = var.backend_security_group  # Cho phép từ ALB SG
+      source_security_group_id = var.backend_security_group_id  # Cho phép từ ALB SG
     }
   ]
 

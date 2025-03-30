@@ -25,3 +25,9 @@ variable "public_subnet_ids" {
   type = list(string)
   description = "Id của Subnet"
 }
+variable "backend_security_group_id" {
+  type = string
+}
+variable "backend_security_group_name" {
+  type = string
+}
