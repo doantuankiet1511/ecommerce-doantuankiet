@@ -7,8 +7,11 @@ variable "jenkins_server_ami" {
 variable "jenkins_server_instance_type" {
   type = string
 }
-variable "vpc_id" {
+variable "vpc_id_backend_security_group" {
   type = string
+}
+variable "vpc_id" {
+  
 }
 variable "key_name" {
   description = "udemy-singapore-key"
@@ -25,9 +28,9 @@ variable "public_subnet_ids" {
   type = list(string)
   description = "Id của Subnet"
 }
-variable "backend_security_group_id" {
+variable "backend_security_group_name" {
   type = string
 }
-variable "backend_security_group_name" {
+variable "alb_security_group_id" {
   type = string
 }

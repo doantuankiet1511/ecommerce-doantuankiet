@@ -49,7 +49,17 @@ python3 -m venv venv
 #kích hoạt venv
 source venv/bin/activate
 
+#route53
+cần gắn ns domain vào nhà cung cấp nếu mua từ nhà cung cấp khác
+
 #tải django vào venv
 pip install django
 #tải package cần thiết bằng file requirement.txt
 pip install -r /path/to/requirements.txt
+tải thêm vài cái package còn thiếu
+
+
+#rds và django
+sau khi tạo rds xong thì vô mysql workbench kết nối rồi chạy fukiappdb.sql vào để load dữ liệu
+sau đó vô ec2 có cái backend update kết nối trong setting.py, rồi lưu lại dưới dạng ami
+gắn launch template đó vô ami

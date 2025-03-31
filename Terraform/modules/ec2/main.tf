@@ -68,23 +68,27 @@ module "backend_security_group" {
 
   name        = var.backend_security_group_name
   description = "Security group for EC2 instances running Django"
-  vpc_id      = var.vpc_id
+  vpc_id      = var.vpc_id_backend_security_group
 
-  ingress_rules = [
+  # Ingress rule: Cho phép traffic từ ALB SG vào port 8000
+  ingress_with_source_security_group_id = [
     {
       from_port                = 8000
       to_port                  = 8000
       protocol                 = "tcp"
-      source_security_group_id = var.backend_security_group_id  # Cho phép từ ALB SG
+      source_security_group_id = var.alb_security_group_id  # Cho phép từ ALB SG
+      description              = "Allow inbound traffic from ALB to Django on port 8000"
     }
   ]
 
-  egress_rules = [
+  # Egress rule: Cho phép tất cả outbound traffic
+  egress_with_cidr_blocks = [
     {
       from_port   = 0
       to_port     = 0
-      protocol    = "-1"
-      cidr_blocks = ["0.0.0.0/0"]  # Cho phép outbound để kết nối RDS
+      protocol    = "-1"  # -1 nghĩa là tất cả protocol
+      cidr_blocks = "0.0.0.0/0"
+      description = "Allow all outbound traffic to connect to RDS"
     }
   ]
 

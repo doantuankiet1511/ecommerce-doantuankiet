@@ -133,6 +133,9 @@ variable "jenkins_volume_size" {
 variable "jenkins_volume_type" {
   type = string
 }
+variable "backend_security_group_name" {
+  type = string
+}
 
 #route53
 variable "domain_name" {
@@ -161,4 +164,28 @@ variable "acm_certificate_arn_alb" {
 }
 variable "alb_security_group_name" {
   type = string
+}
+variable "ami_id" {
+  type = string
+}
+variable "rds_password" {
+  type = string
+}
+
+#rds
+variable "db_instance_class" {
+  type = string
+}
+variable "db_username" {
+  type = string
+}
+variable "db_password" {
+  type = string
+}
+variable "db_name" {
+  type = string
+}
+variable "myIP" {
+  type = string
+  description = "IP của bạn/32"
 }

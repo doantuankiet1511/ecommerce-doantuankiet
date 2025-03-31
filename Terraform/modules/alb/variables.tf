@@ -13,9 +13,21 @@ variable "acm_certificate_arn_alb" {
 variable "public_subnet_ids" {
   type = list(string)
 }
+variable "private_subnet_ids" {
+  type = list(string)
+}
 variable "ami_id" {
   type = string
 }
 variable "backend_security_group_id" {
+  type = string
+}
+variable "rds_endpoint" {
+  type = string
+}
+variable "rds_username" {
+  type = string
+}
+variable "rds_password" {
   type = string
 }
