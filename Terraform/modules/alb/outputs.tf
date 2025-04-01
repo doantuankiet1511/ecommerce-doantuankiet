@@ -1,4 +1,3 @@
-output "alb_security_group_id" {
-  value = module.alb.security_group_id
-  description = "security group của alb"
+output "alb_security_group" {
+  value = module.alb_security_group.security_group_id
 }

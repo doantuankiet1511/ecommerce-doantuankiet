@@ -1,43 +1,59 @@
-# Tạo RDS MySQL bằng module RDS từ Terraform Registry
-module "rds" {
-  source  = "terraform-aws-modules/rds/aws"
-  version = "~> 6.0"
-
-  identifier = "fukiapp-rds"
-
-  # Cấu hình engine MySQL
-  engine            = "mysql"
-  engine_version    = "8.0"
-  instance_class    = var.db_instance_class  # Free Tier eligible
-  allocated_storage = 20             # Dung lượng lưu trữ (GB)
-  major_engine_version = "8.0"
-  family = "mysql8.0"
-  # Thông tin database
-  db_name  = var.db_name
-  username = var.db_username
-  password = var.db_password  # Mật khẩu nhạy cảm, dùng biến
-  port     = 3306
+resource "aws_db_instance" "fukiapp_rds" {
+  identifier           = "fukiapp-rds"
   
-
+  # Cấu hình engine MySQL
+  engine               = "mysql"
+  engine_version       = "8.0"                  # Chỉ cần engine_version
+  instance_class       = var.db_instance_class  # Free Tier eligible
+  allocated_storage    = 20                     # Dung lượng lưu trữ (GB)
+  
+  # Thông tin database
+  db_name              = var.db_name
+  username             = var.db_username
+  password             = var.db_password        # Mật khẩu nhạy cảm, dùng biến
+  port                 = 3306
+  
   # Gắn vào VPC
-  vpc_security_group_ids = [module.rds_security_group.security_group_id]  # Biến cho SG có sẵn
-  subnet_ids             = var.private_subnet_ids      # Biến cho private subnets
+  vpc_security_group_ids = [module.rds_security_group.security_group_id]  # Security Group từ module
+  db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name     # Tham chiếu subnet group
 
   # Cấu hình backup và maintenance
-  backup_retention_period = 7   # Lưu backup 7 ngày
+  backup_retention_period = 7                    # Lưu backup 7 ngày
   backup_window           = "03:00-04:00"
   maintenance_window      = "Mon:04:00-Mon:05:00"
 
   # Bật encryption
-  storage_encrypted = true
+  storage_encrypted       = true
 
   # Tắt snapshot cuối cùng khi destroy để tránh chi phí
-  skip_final_snapshot = true
+  skip_final_snapshot     = true
 
   # Tags
   tags = {
     Name        = "fukiapp-rds"
     Environment = "production"
+  }
+}
+
+
+# Tạo DB Subnet Group riêng (bắt buộc khi không dùng module)
+resource "aws_db_subnet_group" "rds_subnet_group" {
+  name       = "fukiapp-rds-subnet-group"
+  subnet_ids = var.private_subnet_ids  # Danh sách private subnet IDs
+
+  tags = {
+    Name        = "fukiapp-rds-subnet-group"
+    Environment = "production"
+  }
+}
+
+resource "null_resource" "db_setup" {
+  depends_on = [aws_db_instance.fukiapp_rds]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      mysql -h ${aws_db_instance.fukiapp_rds.endpoint} -u ${var.db_username} -p${var.db_password} ${var.db_name} < ../fukiappdb.sql
+    EOT
   }
 }
 

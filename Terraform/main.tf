@@ -32,6 +32,8 @@ module "alb" {
   rds_password = var.rds_password
   rds_username = module.rds.db_username
   private_subnet_ids = [module.vpc.private_subnet_ids_1, module.vpc.private_subnet_ids_2]
+  rds_setup_id = module.rds.rds_setup_id
+  rds_name = module.rds.db_name
 }
 
 module "ec2" {
@@ -44,7 +46,7 @@ module "ec2" {
   jenkins_volume_size = var.jenkins_volume_size
   jenkins_volume_type = var.jenkins_volume_type
   public_subnet_ids = [module.vpc.public_subnet_ids_1]
-  alb_security_group_id = module.alb.alb_security_group_id
+  alb_security_group_id = module.alb.alb_security_group
   backend_security_group_name = var.backend_security_group_name
   vpc_id_backend_security_group = module.vpc.vpc_id
 }
@@ -59,6 +61,7 @@ module "rds" {
   vpc_id = module.vpc.vpc_id
   myIP = var.myIP
   private_subnet_ids = [module.vpc.private_subnet_ids_1, module.vpc.private_subnet_ids_2]
+  
 }
 
 # module "route53" {
