@@ -31,7 +31,7 @@ resource "aws_launch_template" "backend" {
     }
   }
 
-  depends_on = [var.rds_setup_id] # Đảm bảo database được khởi tạo trước
+  depends_on = [var.db_initializer_id]
 }
 
 # Module ALB
@@ -142,24 +142,53 @@ module "alb_security_group" {
 }
 
 # Module Backend ASG
-module "backend_asg" {
-  source  = "terraform-aws-modules/autoscaling/aws"
-  version = "~> 6.0"
+# module "backend_asg" {
+#   source  = "terraform-aws-modules/autoscaling/aws"
+#   version = "~> 6.0"
 
-  name = "fukiapp-backend-asg"
+#   name = "fukiapp-backend-asg"
 
+#   vpc_zone_identifier = var.private_subnet_ids
+#   target_group_arns = [aws_lb_target_group.backend.arn] # Tham chiếu ARN từ target_groups
+#   health_check_type   = "ELB"
+#   min_size            = 2
+#   max_size            = 4
+#   desired_capacity    = 2
+
+#   launch_template = aws_launch_template.backend.id
+  
+#   tags = {
+#     Name        = "fukiapp-backend"
+#     Environment = "production"
+#   }
+# }
+resource "aws_autoscaling_group" "backend_asg" {
+  name                = "fukiapp-backend-asg"
   vpc_zone_identifier = var.private_subnet_ids
-  target_group_arns = [aws_lb_target_group.backend.arn] # Tham chiếu ARN từ target_groups
+  target_group_arns   = [aws_lb_target_group.backend.arn]
   health_check_type   = "ELB"
   min_size            = 2
   max_size            = 4
   desired_capacity    = 2
 
-  launch_template = aws_launch_template.backend.id
-   
-
-  tags = {
-    Name        = "fukiapp-backend"
-    Environment = "production"
+  launch_template {
+    id      = aws_launch_template.backend.id
+    version = "$Latest"  # Dùng phiên bản mới nhất của Launch Template
   }
+
+  health_check_grace_period = 300  # Thời gian chờ trước khi kiểm tra health (giây)
+
+  tag {
+    key                 = "Name"
+    value               = "fukiapp-backend"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "Environment"
+    value               = "production"
+    propagate_at_launch = true
+  }
+
+  depends_on = [aws_launch_template.backend]  # Đảm bảo Launch Template sẵn sàng
 }

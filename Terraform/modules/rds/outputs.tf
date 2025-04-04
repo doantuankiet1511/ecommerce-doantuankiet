@@ -7,6 +7,6 @@ output "db_username" {
 output "db_name" {
   value = aws_db_instance.fukiapp_rds.db_name
 }
-output "rds_setup_id" {
-  value = null_resource.db_setup.id
+output "rds_instance_id" {
+  value = aws_db_instance.fukiapp_rds.id
 }

@@ -34,6 +34,6 @@ variable "rds_password" {
 variable "rds_name" {  
   type = string
 }
-variable "rds_setup_id" {
+variable "db_initializer_id" {
   type = string
 }

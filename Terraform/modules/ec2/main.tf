@@ -32,6 +32,7 @@ EOF
   }
 }
 
+
 module "jenkins_sg" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "~> 5.1"  # Phiên bản mới nhất tại thời điểm hiện tại
@@ -94,6 +95,32 @@ module "backend_security_group" {
 
   tags = {
     Name        = "fukiapp-backend-sg"
+    Environment = "production"
+  }
+}
+
+module "ec2_db_initializer" {
+  source  = "terraform-aws-modules/ec2-instance/aws"
+  version = "~> 5.0"  # Phiên bản mới nhất tại thời điểm hiện tại
+
+  name                   = "fukiapp-db-initializer"
+  ami                    = "ami-0b426d3baee028580"  # AMI chứa file SQL
+  instance_type          = "t2.micro"
+  subnet_id              = var.private_subnet_ids[0]  # Thay bằng subnet ID
+  vpc_security_group_ids = [module.backend_security_group.security_group_id]  # Thay bằng SG ID
+
+  user_data = base64encode(<<-EOF
+    #!/bin/bash
+    mysql -h ${var.rds_endpoint} -u ${var.rds_username} -p${var.rds_password} -e "CREATE DATABASE IF NOT EXISTS ${var.rds_password};"
+    cd /home/ec2-user/Mysql-Ecommerce  # Di chuyển vào thư mục chứa file SQL
+    mysql -h ${var.rds_endpoint} -u ${var.rds_username} -p${var.rds_password} ${var.rds_name} < fukiappdb.sql
+    EOF
+  )
+
+  depends_on = [var.rds_instance_id]  # Đợi RDS sẵn sàng
+
+  tags = {
+    Name        = "fukiapp-db-initializer"
     Environment = "production"
   }
 }

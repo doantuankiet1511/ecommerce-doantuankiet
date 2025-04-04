@@ -32,8 +32,9 @@ module "alb" {
   rds_password = var.rds_password
   rds_username = module.rds.db_username
   private_subnet_ids = [module.vpc.private_subnet_ids_1, module.vpc.private_subnet_ids_2]
-  rds_setup_id = module.rds.rds_setup_id
+  db_initializer_id = module.ec2.ec2_db_initializer_id
   rds_name = module.rds.db_name
+  
 }
 
 module "ec2" {
@@ -49,6 +50,13 @@ module "ec2" {
   alb_security_group_id = module.alb.alb_security_group
   backend_security_group_name = var.backend_security_group_name
   vpc_id_backend_security_group = module.vpc.vpc_id
+
+  rds_endpoint = module.rds.rds_endpoint
+  rds_instance_id = module.rds.rds_instance_id
+  rds_name = module.rds.db_name
+  rds_password = var.rds_password
+  rds_username = module.rds.db_username
+  private_subnet_ids = [module.vpc.private_subnet_ids_1]
 }
 
 module "rds" {

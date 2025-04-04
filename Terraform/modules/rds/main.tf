@@ -47,15 +47,15 @@ resource "aws_db_subnet_group" "rds_subnet_group" {
   }
 }
 
-resource "null_resource" "db_setup" {
-  depends_on = [aws_db_instance.fukiapp_rds]
+# resource "null_resource" "db_setup" {
+#   depends_on = [aws_db_instance.fukiapp_rds]
 
-  provisioner "local-exec" {
-    command = <<EOT
-      mysql -h ${aws_db_instance.fukiapp_rds.endpoint} -u ${var.db_username} -p${var.db_password} ${var.db_name} < ../fukiappdb.sql
-    EOT
-  }
-}
+#   provisioner "local-exec" {
+#     command = <<EOT
+#       mysql -h ${aws_db_instance.fukiapp_rds.endpoint} -u ${var.db_username} -p${var.db_password} ${var.db_name} < ../fukiappdb.sql
+#     EOT
+#   }
+# }     
 
 # Tạo Security Group cho RDS
 module "rds_security_group" {
