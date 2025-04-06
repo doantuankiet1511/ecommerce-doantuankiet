@@ -44,3 +44,15 @@ resource "aws_route53_record" "cloudfront" {
     evaluate_target_health = var.evaluate_target_health
   }
 }
+
+resource "aws_route53_record" "alb" {
+  zone_id = module.route53_zone.route53_zone_zone_id[var.domain_name]
+  name    = "api.${var.domain_name}"  # api.fukishop.click
+  type    = "A"
+
+  alias {
+    name                   = var.alb_dns_name # DNS name của ALB
+    zone_id                = var.alb_zone_id  # Zone ID của ALB
+    evaluate_target_health = true  # Kiểm tra sức khỏe target
+  }
+}

@@ -6,15 +6,19 @@ resource "aws_launch_template" "backend" {
 
   user_data = base64encode(<<-EOF
     #!/bin/bash
-    # Cấu hình settings.py
-    cd /home/ec2-user/Django-Ecommerce/fukiappstore/fukiapp/fukiapp
-    sed -i "s/'HOST': .*/'HOST': '${var.rds_endpoint}',/" settings.py
-    sed -i "s/'USER': .*/'USER': '${var.rds_username}',/" settings.py
-    sed -i "s/'PASSWORD': .*/'PASSWORD': '${var.rds_password}',/" settings.py
-    sed -i "s/'NAME': .*/'NAME': '${var.rds_name}',/" settings.py
-    # Chạy ứng dụng
-    cd /home/ec2-user/Django-Ecommerce/fukiappstore/fukiapp
-    nohup gunicorn --workers 3 --bind 0.0.0.0:8000 fukiapp.wsgi:application &
+    # Đảm bảo quyền sở hữu mã nguồn cho ec2-user
+    chown -R ec2-user:ec2-user /home/ec2-user/Django-Ecommerce
+
+    # Cấu hình settings.py dưới quyền ec2-user
+    su ec2-user -c "cd /home/ec2-user/Django-Ecommerce/fukiappstore/fukiapp/fukiapp && \
+      sed -i \"s/'HOST': .*/'HOST': '${var.rds_endpoint}',/\" settings.py && \
+      sed -i \"s/'USER': .*/'USER': '${var.rds_username}',/\" settings.py && \
+      sed -i \"s/'PASSWORD': .*/'PASSWORD': '${var.rds_password}',/\" settings.py && \
+      sed -i \"s/'NAME': .*/'NAME': '${var.rds_name}',/\" settings.py"
+
+    # Chạy Gunicorn dưới quyền ec2-user
+    su ec2-user -c "cd /home/ec2-user/Django-Ecommerce/fukiappstore/fukiapp && \
+      nohup /usr/bin/python3 -m gunicorn --workers 3 --bind 0.0.0.0:8000 fukiapp.wsgi:application > /tmp/gunicorn.log 2>&1 &"
     EOF
   )
 

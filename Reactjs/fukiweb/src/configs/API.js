@@ -47,12 +47,12 @@ export const endpoints = {
 }
 
 export const authAPI = () => axios.create({
-    baseURL: "http://127.0.0.1:8000/",
+    baseURL: "https://api.fukishop.click/",
     headers: {
         "Authorization": `Bearer ${cookie.load("access-token")}`
     }
 })
 
 export default axios.create({
-    baseURL: "http://127.0.0.1:8000/"
+    baseURL: "https://api.fukishop.click/"
 })
