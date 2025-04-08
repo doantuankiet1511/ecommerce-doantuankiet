@@ -4,7 +4,7 @@ resource "aws_launch_template" "backend" {
   image_id      = var.ami_id
   instance_type = "t2.medium"
 
-  user_data = base64encode(<<-EOF
+ user_data = base64encode(<<-EOF
     #!/bin/bash
     # Đảm bảo quyền sở hữu mã nguồn cho ec2-user
     chown -R ec2-user:ec2-user /home/ec2-user/Django-Ecommerce
@@ -16,11 +16,16 @@ resource "aws_launch_template" "backend" {
       sed -i \"s/'PASSWORD': .*/'PASSWORD': '${var.rds_password}',/\" settings.py && \
       sed -i \"s/'NAME': .*/'NAME': '${var.rds_name}',/\" settings.py"
 
+    # Chạy migrate để cập nhật CSDL
+    su ec2-user -c "cd /home/ec2-user/Django-Ecommerce/fukiappstore/fukiapp && \
+      /usr/bin/python3 manage.py migrate"
+
     # Chạy Gunicorn dưới quyền ec2-user
     su ec2-user -c "cd /home/ec2-user/Django-Ecommerce/fukiappstore/fukiapp && \
       nohup /usr/bin/python3 -m gunicorn --workers 3 --bind 0.0.0.0:8000 fukiapp.wsgi:application > /tmp/gunicorn.log 2>&1 &"
-    EOF
-  )
+EOF
+)
+
 
   network_interfaces {
     associate_public_ip_address = false
@@ -95,7 +100,7 @@ resource "aws_lb_listener" "https" {
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "arn:aws:acm:ap-southeast-1:266324947842:certificate/1a1b6769-ee68-433c-bd88-94e09c14eb40"  # Thay thế bằng ARN của chứng chỉ thực tế
+  certificate_arn   = var.acm_certificate_arn_alb  # Thay thế bằng ARN của chứng chỉ thực tế
 
   default_action {
     type             = "forward"
@@ -195,4 +200,40 @@ resource "aws_autoscaling_group" "backend_asg" {
   }
 
   depends_on = [aws_launch_template.backend]  # Đảm bảo Launch Template sẵn sàng
+}
+
+resource "aws_autoscaling_policy" "scale_up" {
+  name                   = "scale-up-policy"
+  scaling_adjustment     = 1
+  adjustment_type        = "ChangeInCapacity"
+  cooldown               = 300
+  autoscaling_group_name = aws_autoscaling_group.backend_asg.name
+}
+
+resource "aws_autoscaling_policy" "scale_down" {
+  name                   = "scale-down-policy"
+  scaling_adjustment     = -1
+  adjustment_type        = "ChangeInCapacity"
+  cooldown               = 300
+  autoscaling_group_name = aws_autoscaling_group.backend_asg.name
+}
+
+# Scheduled Scaling: Scale down lúc 12g đêm (UTC+7)
+resource "aws_autoscaling_schedule" "scale_down_midnight" {
+  scheduled_action_name  = "scale-down-midnight"
+  min_size               = 1
+  max_size               = 4
+  desired_capacity       = 1
+  recurrence             = "0 17 * * *"  # 17:00 UTC = 00:00 UTC+7
+  autoscaling_group_name = aws_autoscaling_group.backend_asg.name
+}
+
+# Scheduled Scaling: Scale up lúc 8g sáng (UTC+7)
+resource "aws_autoscaling_schedule" "scale_up_morning" {
+  scheduled_action_name  = "scale-up-morning"
+  min_size               = 1
+  max_size               = 4
+  desired_capacity       = 2  # Hoặc 4 nếu bạn muốn bắt đầu với 4 instance
+  recurrence             = "0 1 * * *"   # 01:00 UTC = 08:00 UTC+7
+  autoscaling_group_name = aws_autoscaling_group.backend_asg.name
 }

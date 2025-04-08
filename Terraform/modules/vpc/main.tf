@@ -20,6 +20,9 @@ module "vpc" {
   enable_vpn_gateway = var.enable_vpn_gateway
   create_igw = var.create_igw
 
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+
 
   public_subnet_tags = {
     "Name" = "Public Subnet"

@@ -1,5 +1,5 @@
 output "rds_endpoint" {
-  value = aws_db_instance.fukiapp_rds.endpoint
+  value = split(":", aws_db_instance.fukiapp_rds.endpoint)[0]
 }
 output "db_username" {
   value = aws_db_instance.fukiapp_rds.username

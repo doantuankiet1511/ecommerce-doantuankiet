@@ -59,7 +59,57 @@ pip install -r /path/to/requirements.txt
 tải thêm vài cái package còn thiếu
 
 
-#rds và django
-sau khi tạo rds xong thì vô mysql workbench kết nối rồi chạy fukiappdb.sql vào để load dữ liệu
-sau đó vô ec2 có cái backend update kết nối trong setting.py, rồi lưu lại dưới dạng ami
-gắn launch template đó vô ami
+#điều cần làm sau khi terraform build xong
+vào hostinger cập nhật lại record do aws cung cấp
+
+
+System Architecture Diagram
+=============================
+       [ User ]
+          |
+          | (DNS)
+          v
+    +------------+
+    |  Route53   |
+    +------------+
+          |
+          |-----------------+
+          |                 |
+          v                 v
++----------------+    +-----------------+
+| S3 + CloudFront|    |       ALB       |
+| (Static Assets)|    | (Load Balancer) |
++----------------+    +-----------------+
+                           |
+                           | (HTTP/HTTPS)
+                           v
+                    +-----------------+
+                    |  Target Group   |
+                    +-----------------+
+                           |
+                           | (Traffic)
+                           v
+                    +-----------------+
+                    |  EC2 Backend    |
+                    | (Auto Scaling)  |
+                    +-----------------+
+                           |
+                           | (DB Connection)
+                           v
+                    +-----------------+
+                    |   RDS MySQL     |
+                    |   (Database)    |
+                    +-----------------+
+
+                    +-----------------+
+                    |   CloudWatch    |
+                    |  (Monitoring)   |
+                    +-----------------+
+                           |
+                           | (Alerts)
+                           v
+                    +-----------------+
+                    |      SNS        |
+                    | (Notifications) |
+                    +-----------------+
+=============================

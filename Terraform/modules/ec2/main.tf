@@ -101,23 +101,32 @@ module "backend_security_group" {
 
 module "ec2_db_initializer" {
   source  = "terraform-aws-modules/ec2-instance/aws"
-  version = "~> 5.0"  # Phiên bản mới nhất tại thời điểm hiện tại
+  version = "~> 5.0"
 
   name                   = "fukiapp-db-initializer"
-  ami                    = "ami-0b426d3baee028580"  # AMI chứa file SQL
+  ami                    = "ami-018f79dea75a9ba05"
   instance_type          = "t2.micro"
-  subnet_id              = var.private_subnet_ids[0]  # Thay bằng subnet ID
-  vpc_security_group_ids = [module.backend_security_group.security_group_id]  # Thay bằng SG ID
+  subnet_id              = var.private_subnet_ids[0]
+  vpc_security_group_ids = [module.backend_security_group.security_group_id]
 
-  user_data = base64encode(<<-EOF
+ user_data = base64encode(<<-EOF
     #!/bin/bash
-    mysql -h ${var.rds_endpoint} -u ${var.rds_username} -p${var.rds_password} -e "CREATE DATABASE IF NOT EXISTS ${var.rds_password};"
-    cd /home/ec2-user/Mysql-Ecommerce  # Di chuyển vào thư mục chứa file SQL
-    mysql -h ${var.rds_endpoint} -u ${var.rds_username} -p${var.rds_password} ${var.rds_name} < fukiappdb.sql
+    # Đảm bảo quyền sở hữu thư mục cho ec2-user (chạy dưới quyền root)
+    chown -R ec2-user:ec2-user /home/ec2-user/Mysql-Ecommerce
+
+    # Chuyển sang user ec2-user và chạy tất cả các lệnh
+    su ec2-user -c "
+      # Tạo database
+      mysql -h ${var.rds_endpoint} -u ${var.rds_username} -p${var.rds_password} -e 'CREATE DATABASE IF NOT EXISTS ${var.rds_name};'
+
+      # Import file SQL
+      cd /home/ec2-user/Mysql-Ecommerce
+      mysql -h ${var.rds_endpoint} -u ${var.rds_username} -p${var.rds_password} ${var.rds_name} < fukiappdb.sql
+    "
     EOF
   )
 
-  depends_on = [var.rds_instance_id]  # Đợi RDS sẵn sàng
+  depends_on = [var.rds_instance_id]
 
   tags = {
     Name        = "fukiapp-db-initializer"

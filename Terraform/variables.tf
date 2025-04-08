@@ -190,3 +190,11 @@ variable "myIP" {
   type = string
   description = "IP của bạn/32"
 }
+
+#sns
+variable "topic_name" {
+  type = string
+}
+variable "your_email" {
+  type = string
+}

@@ -137,4 +137,19 @@ module "vpc" {
   create_igw = var.create_igw
 }
 
+module "cloudwatch" {
+  source = "./modules/cloudwatch"
+  auto_scaling_policy_scale_down_arn = module.alb.auto_scaling_policy_scale_down_arn
+  auto_scaling_policy_scale_up_arn = module.alb.auto_scaling_policy_scale_up_arn
+  aws_autoscaling_group_backend_asg_name = module.alb.aws_autoscaling_group_backend_asg_name
+  aws_sns_topic_cpu_alert_arn = module.sns.aws_sns_topic_cpu_alert_arn
+}
+
+module "sns" {
+  source = "./modules/sns"
+  your_email = var.your_email
+  topic_name = var.topic_name
+
+}
+
 
