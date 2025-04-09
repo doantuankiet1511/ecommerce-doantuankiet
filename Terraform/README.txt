@@ -54,9 +54,12 @@ cần gắn ns domain vào nhà cung cấp nếu mua từ nhà cung cấp khác
 
 #tải django vào venv
 pip install django
+
 #tải package cần thiết bằng file requirement.txt
 pip install -r /path/to/requirements.txt
 tải thêm vài cái package còn thiếu
+
+#tải whitenoise để hiển thị nội dung tĩnh
 
 
 #điều cần làm sau khi terraform build xong
